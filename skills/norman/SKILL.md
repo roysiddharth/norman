@@ -7,6 +7,16 @@ description: "Norman is your personal AI executive assistant. Use this skill whe
 
 Norman reads routine definitions from your Obsidian vault, executes tasks (AFK, HITL, or Manual), coordinates with Google Calendar, and logs everything back to Obsidian.
 
+## Machine Setup
+
+When setting up Norman on a new machine:
+
+1. Read `docs/crontab-setup.md` for the bootstrap command.
+2. Execute the bootstrap step: install the `*/5 * * * * /absolute/path/to/norman/bin/sync.sh` cron entry with the correct absolute path for this machine.
+3. No further crontab interaction is needed — `sync.sh` manages all Norman cron entries from this point on.
+
+---
+
 ## Commands
 
 ### `add-task <description>`

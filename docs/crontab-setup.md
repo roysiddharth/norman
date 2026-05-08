@@ -1,10 +1,13 @@
 # Crontab Setup
 
-Wire a Norman routine into cron by calling `bin/run.sh` with the routine name:
+Norman manages its own cron entries automatically via `bin/sync.sh`. The only manual step is a one-time bootstrap: install the `sync.sh` entry into crontab.
 
-```cron
-0 8 * * * /path/to/norman/bin/run.sh morning-dogs
-*/15 * * * * /path/to/norman/bin/run.sh drain-queue
+## Bootstrap (run once per machine)
+
+```bash
+(crontab -l 2>/dev/null; echo "*/5 * * * * /absolute/path/to/norman/bin/sync.sh") | crontab -
 ```
 
-Use an absolute path to `bin/run.sh`; cron does not start in the repository directory.
+Replace `/absolute/path/to/norman` with the absolute path to your clone of this repository (e.g. `/Users/sid/Projects/project-norman`).
+
+After this, `sync.sh` runs every 5 minutes and rewrites the `# BEGIN NORMAN` / `# END NORMAN` managed block in crontab to match the routines in `vault/Norman/Routines/`. Adding or removing a routine takes effect within 5 minutes — no further crontab editing required.
