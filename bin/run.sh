@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Norman cron launcher — invokes a named routine non-interactively via claude -p.
+# Norman cron launcher - invokes a named routine non-interactively via claude -p.
 # Usage: bin/run.sh <routine-name>
 # Crontab example: 0 8 * * * /path/to/norman/bin/run.sh morning-dogs
 
@@ -13,6 +13,18 @@ if [[ -z "$ROUTINE_NAME" ]]; then
   exit 1
 fi
 
-# Norman is not yet fully implemented. This stub exits gracefully.
-echo "Norman run.sh: routine '$ROUTINE_NAME' received. (stub — full implementation pending)"
-exit 0
+if [[ "$#" -ne 1 ]]; then
+  echo "Error: exactly one routine name is required." >&2
+  echo "Usage: $0 <routine-name>" >&2
+  exit 1
+fi
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+ROUTINE_PATH="$ROOT_DIR/vault/Norman/Routines/$ROUTINE_NAME.md"
+
+PROMPT="Use the Norman skill. Read $ROUTINE_PATH and execute the routine named '$ROUTINE_NAME' using Norman's shared execution logic. Write the execution log to vault/Norman/Log/YYYY-MM-DD.md and return a clear summary of the outcome."
+
+claude -p "$PROMPT"
+
+echo "Norman run.sh: triggered routine '$ROUTINE_NAME'."
