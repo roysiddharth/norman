@@ -36,7 +36,7 @@ Intake a new ad-hoc task conversationally and write it to the Obsidian queue.
    - **Slug:** lowercase description, non-alphanumeric chars replaced with hyphens, collapsed and trimmed, truncated to 40 chars (e.g., `"Feed the dogs!"` → `feed-the-dogs`)
    - **Filename:** `<timestamp>-<slug>.md` (e.g., `20260508-143022-feed-the-dogs.md`)
    - **ISO timestamp:** current datetime in ISO 8601 format with timezone offset (e.g., `2026-05-08T14:30:22-07:00`)
-5. Invoke the `obsidian:obsidian-cli` skill to write the queue note:
+5. Invoke the `norman:obsidian-cli` skill to write the queue note:
    ```bash
    obsidian create path="Norman/Queue/<filename>" content="---\nadded_at: \"<ISO timestamp>\"\ndescription: \"<task description>\"\ntype: <AFK|HITL|Manual>\nstatus: pending\n---" silent
    ```
@@ -56,12 +56,12 @@ Intake a new ad-hoc task conversationally and write it to the Obsidian queue.
 Manually execute a named routine from the Obsidian vault without waiting for cron.
 
 1. Accept exactly one routine name argument, as in `/norman run morning-dogs`
-2. Read `vault/Norman/Routines/<routine-name>.md` using obsidian-cli. Read the named routine from `vault/Norman/Routines/<routine-name>.md`
+2. Read `vault/Norman/Routines/<routine-name>.md` using norman:obsidian-cli. Read the named routine from `vault/Norman/Routines/<routine-name>.md`
 3. If the file does not exist, tell the user clearly: "No routine found: `<routine-name>`. Check `vault/Norman/Routines/` for available routines." Do not attempt execution or write a success log when the named routine does not exist
 4. Parse only the YAML frontmatter between the opening and closing `---` delimiters to get `name`, `schedule`, `tasks`, `skills`, and `fallback_type`
 5. Execute the routine using the same execution logic as the cron path (`bin/run.sh`). Manual, HITL, and AFK paths must all work from `/norman run`:
-   - **Manual tasks**: check Google Calendar for conflicts via gworkspace; create a calendar block for each; if no free slot, send an email notification
-   - **HITL tasks**: load declared skills; execute automatable steps before handoff; check calendar for conflicts; create a calendar block with handoff context; send handoff email via gworkspace
+   - **Manual tasks**: check Google Calendar for conflicts via norman:gworkspace; create a calendar block for each; if no free slot, send an email notification
+   - **HITL tasks**: load declared skills; execute automatable steps before handoff; check calendar for conflicts; create a calendar block with handoff context; send handoff email via norman:gworkspace
    - **AFK tasks**: load declared skills from frontmatter; execute end-to-end; on failure, re-run as `fallback_type` if set, otherwise send a signal email
 6. Write execution log to `vault/Norman/Log/YYYY-MM-DD.md` using the same log format as cron-triggered runs (append a new section per run)
 7. Return a clear summary naming the routine, tasks executed, and final outcome
@@ -76,7 +76,7 @@ Show today's queue and recent execution log.
 
 **Step 1: List pending queue items**
 
-Invoke the `obsidian:obsidian-cli` skill. Search for notes in the Queue folder:
+Invoke the `norman:obsidian-cli` skill. Search for notes in the Queue folder:
 
 ```bash
 obsidian search query='path:"Norman/Queue"' limit=100
@@ -157,9 +157,9 @@ Shared between `run` and the cron path (`bin/run.sh`).
 
 1. Parse task `description` and `duration_minutes` from routine note
 2. Process only tasks whose `type` is `Manual` for the Manual execution path
-3. Use gworkspace to inspect the calendar before scheduling, using the task's desired window derived from the routine `schedule` and `duration_minutes`
+3. Use norman:gworkspace to inspect the calendar before scheduling, using the task's desired window derived from the routine `schedule` and `duration_minutes`
 4. If a free slot exists: Create a Google Calendar block for each Manual task and use the task `description` as the event title
-5. If no conflict-free slot is available, send an email notification via gworkspace Gmail instead of failing silently; include the routine name, task description, desired window, and conflict summary
+5. If no conflict-free slot is available, send an email notification via norman:gworkspace Gmail instead of failing silently; include the routine name, task description, desired window, and conflict summary
 6. Append the Manual execution result to `vault/Norman/Log/YYYY-MM-DD.md` with routine name, timestamp, tasks scheduled, and any conflicts
 
 ### Task type: HITL
@@ -167,12 +167,12 @@ Shared between `run` and the cron path (`bin/run.sh`).
 1. Process only tasks whose `type` is `HITL` for the HITL execution path
 2. Load skills listed in the routine frontmatter `skills` field before automating HITL steps
 3. Execute any automatable HITL steps using those declared skills before handing off to the human
-4. Check Google Calendar for conflicts via gworkspace before creating the HITL handoff block
+4. Check Google Calendar for conflicts via norman:gworkspace before creating the HITL handoff block
 5. Create the HITL handoff calendar block only in a conflict-free slot; HITL calendar event description must contain what Norman completed, what the human must do, and any relevant context:
    - What Norman completed
    - What the human must do
    - Any relevant context
-6. Send a HITL handoff email via gworkspace with the same context as the calendar event
+6. Send a HITL handoff email via norman:gworkspace with the same context as the calendar event
 7. Append the HITL execution result to `vault/Norman/Log/YYYY-MM-DD.md` with steps completed, handoff time, and calendar block created
 
 ### Task type: AFK
@@ -182,7 +182,7 @@ Shared between `run` and the cron path (`bin/run.sh`).
 3. Execute the task end-to-end using loaded skills
 4. On failure:
     - If `fallback_type` is set in frontmatter: re-run the task as that type
-    - Otherwise: send a signal email with failure details via gworkspace Gmail
+    - Otherwise: send a signal email with failure details via norman:gworkspace Gmail
 5. Send signal email only on failure or escalation — never on successful runs
 6. Append the AFK execution result to `vault/Norman/Log/YYYY-MM-DD.md` with success or failure, and any escalation
 
@@ -198,4 +198,4 @@ After every run (success or failure), append a section to `vault/Norman/Log/YYYY
 - **Escalations:** <any escalations or failures>
 ```
 
-Use obsidian-cli to write log entries.
+Use norman:obsidian-cli to write log entries.

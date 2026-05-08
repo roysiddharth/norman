@@ -5,11 +5,5 @@
   "author": {
     "name": "Siddharth Roy",
     "url": "https://github.com/roysiddharth"
-  },
-  "dependencies": [
-    "obsidian@obsidian-skills"
-  ],
-  "requiredSkills": [
-    "gworkspace"
-  ]
+  }
 }
