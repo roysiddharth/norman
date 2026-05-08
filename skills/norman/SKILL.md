@@ -20,18 +20,22 @@ Intake a new ad-hoc task conversationally and write it to the Obsidian queue.
    - **AFK** — can be completed end-to-end by the agent (no human needed)
    - **HITL** — agent handles automatable steps, human must complete the rest
    - **Manual** — human must do everything; agent just schedules a calendar block
-3. If classification is ambiguous, ask the user to confirm the type
-4. Write a queue note to `vault/Norman/Queue/` using obsidian-cli:
-   ```yaml
-   ---
-   added_at: <ISO timestamp>
-   description: <parsed task description>
-   type: <AFK|HITL|Manual>
-   status: pending
-   ---
+3. If classification is ambiguous, ask the user to confirm the type before proceeding
+4. Generate the filename and note content:
+   - **Timestamp:** current datetime in `YYYYMMDD-HHmmss` format (local time)
+   - **Slug:** lowercase description, non-alphanumeric chars replaced with hyphens, collapsed and trimmed, truncated to 40 chars (e.g., `"Feed the dogs!"` → `feed-the-dogs`)
+   - **Filename:** `<timestamp>-<slug>.md` (e.g., `20260508-143022-feed-the-dogs.md`)
+   - **ISO timestamp:** current datetime in ISO 8601 format with timezone offset (e.g., `2026-05-08T14:30:22-07:00`)
+5. Invoke the `obsidian:obsidian-cli` skill to write the queue note:
+   ```bash
+   obsidian create path="Norman/Queue/<filename>" content="---\nadded_at: \"<ISO timestamp>\"\ndescription: \"<task description>\"\ntype: <AFK|HITL|Manual>\nstatus: pending\n---" silent
    ```
-   Filename: `<YYYYMMDD-HHmmss>-<slug>.md` (timestamp-based, unique)
-5. Confirm back to the user with a summary: task description, type, and filename
+6. Confirm back to the user with a summary:
+   ```
+   Queued: <description>
+   Type: <AFK|HITL|Manual>
+   File: Norman/Queue/<filename>
+   ```
 
 ---
 
