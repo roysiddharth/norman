@@ -47,7 +47,7 @@ Manually execute a named routine from the Obsidian vault without waiting for cro
 
 1. Read `vault/Norman/Routines/<routine-name>.md` using obsidian-cli
 2. If the file does not exist, tell the user clearly: "No routine found: `<routine-name>`. Check `vault/Norman/Routines/` for available routines."
-3. Parse frontmatter to get tasks, skills, and fallback_type
+3. Parse only the YAML frontmatter between the opening and closing `---` delimiters to get `name`, `schedule`, `tasks`, `skills`, and `fallback_type`
 4. Execute each task using the shared execution logic (same as cron path):
    - **Manual tasks**: check Google Calendar for conflicts via gworkspace; create a calendar block for each; if no free slot, send an email notification
    - **HITL tasks**: execute automatable steps using declared skills; check calendar for conflicts; create a calendar block with handoff context; send handoff email via gworkspace
@@ -117,9 +117,11 @@ Shared between `run` and the cron path (`bin/run.sh`).
 ### Task type: Manual
 
 1. Parse task `description` and `duration_minutes` from routine note
-2. Check Google Calendar for conflicts in the desired time window via gworkspace
-3. If a free slot exists: create a calendar block with the task description as event title
-4. If no free slot: send an email notification (via gworkspace Gmail) with the task details
+2. Process only tasks whose `type` is `Manual` for the Manual execution path
+3. Use gworkspace to inspect the calendar before scheduling, using the task's desired window derived from the routine `schedule` and `duration_minutes`
+4. If a free slot exists: Create a Google Calendar block for each Manual task and use the task `description` as the event title
+5. If no conflict-free slot is available, send an email notification via gworkspace Gmail instead of failing silently; include the routine name, task description, desired window, and conflict summary
+6. Append the Manual execution result to `vault/Norman/Log/YYYY-MM-DD.md` with routine name, timestamp, tasks scheduled, and any conflicts
 
 ### Task type: HITL
 

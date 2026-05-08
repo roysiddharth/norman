@@ -51,6 +51,7 @@ SH
   assert_contains "$args" "-p"
   assert_contains "$args" "vault/Norman/Routines/morning-dogs.md"
   assert_contains "$args" "execute the routine"
+  assert_contains "$args" "Manual tasks must check Google Calendar and create calendar blocks"
 }
 
 test_rejects_extra_arguments() {
