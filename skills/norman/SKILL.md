@@ -50,7 +50,7 @@ Manually execute a named routine from the Obsidian vault without waiting for cro
 3. Parse only the YAML frontmatter between the opening and closing `---` delimiters to get `name`, `schedule`, `tasks`, `skills`, and `fallback_type`
 4. Execute each task using the shared execution logic (same as cron path):
    - **Manual tasks**: check Google Calendar for conflicts via gworkspace; create a calendar block for each; if no free slot, send an email notification
-   - **HITL tasks**: execute automatable steps using declared skills; check calendar for conflicts; create a calendar block with handoff context; send handoff email via gworkspace
+   - **HITL tasks**: load declared skills; execute automatable steps before handoff; check calendar for conflicts; create a calendar block with handoff context; send handoff email via gworkspace
    - **AFK tasks**: load declared skills from frontmatter; execute end-to-end; on failure, re-run as `fallback_type` if set, otherwise send a signal email
 5. Write execution log to `vault/Norman/Log/YYYY-MM-DD.md` (append a new section per run)
 6. Return a summary of what was executed and the outcome
@@ -125,13 +125,16 @@ Shared between `run` and the cron path (`bin/run.sh`).
 
 ### Task type: HITL
 
-1. Execute any automatable steps using skills declared in routine frontmatter
-2. Check Google Calendar for conflicts via gworkspace
-3. Create a calendar block; event description must include:
+1. Process only tasks whose `type` is `HITL` for the HITL execution path
+2. Load skills listed in the routine frontmatter `skills` field before automating HITL steps
+3. Execute any automatable HITL steps using those declared skills before handing off to the human
+4. Check Google Calendar for conflicts via gworkspace before creating the HITL handoff block
+5. Create the HITL handoff calendar block only in a conflict-free slot; HITL calendar event description must contain what Norman completed, what the human must do, and any relevant context:
    - What Norman completed
    - What the human must do
    - Any relevant context
-4. Send a handoff email via gworkspace with the same information
+6. Send a HITL handoff email via gworkspace with the same context as the calendar event
+7. Append the HITL execution result to `vault/Norman/Log/YYYY-MM-DD.md` with steps completed, handoff time, and calendar block created
 
 ### Task type: AFK
 
