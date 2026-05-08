@@ -100,12 +100,30 @@ obsidian read path="Norman/Log/<YYYY-MM-DD>.md"
 
 If the file does not exist, note that no runs have been logged today.
 
-**Step 3: Format and output**
+**Step 3: Check sync status**
+
+Run the following to inspect crontab:
+
+```bash
+crontab -l 2>/dev/null || true
+```
+
+From the output:
+- **Bootstrap installed** — true if any line contains `sync.sh`
+- **Managed block present** — true if `# BEGIN NORMAN` and `# END NORMAN` markers are present
+- **Managed entries** — lines between those markers that are not comments (i.e., actual cron lines)
+
+**Step 4: Format and output**
 
 Format the result clearly for the Claude Code conversation:
 
 ```
 ## Norman Status — <YYYY-MM-DD>
+
+### Sync
+- Bootstrap: ✓ sync.sh installed (runs every 5 min)   [or ✗ not installed — run bootstrap from docs/crontab-setup.md]
+- Managed entries: <count>
+  - <routine-name>: <cron-expression>
 
 ### Queue (pending)
 - [AFK] <description>
@@ -116,6 +134,8 @@ Format the result clearly for the Claude Code conversation:
 - <time> — <routine-name>: <outcome summary>
 ```
 
+- If bootstrap is not installed, show the exact bootstrap command from `docs/crontab-setup.md` with the correct absolute path filled in
+- If managed block is absent or empty: output `  _No managed entries — sync.sh has not run yet or no routines are scheduled._`
 - If no pending items: output `### Queue (pending)\n_No pending tasks._`
 - If no log file for today: output `### Today's Log\n_No runs logged today._`
 
