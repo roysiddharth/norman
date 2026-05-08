@@ -45,15 +45,16 @@ Intake a new ad-hoc task conversationally and write it to the Obsidian queue.
 
 Manually execute a named routine from the Obsidian vault without waiting for cron.
 
-1. Read `vault/Norman/Routines/<routine-name>.md` using obsidian-cli
-2. If the file does not exist, tell the user clearly: "No routine found: `<routine-name>`. Check `vault/Norman/Routines/` for available routines."
-3. Parse only the YAML frontmatter between the opening and closing `---` delimiters to get `name`, `schedule`, `tasks`, `skills`, and `fallback_type`
-4. Execute each task using the shared execution logic (same as cron path):
+1. Accept exactly one routine name argument, as in `/norman run morning-dogs`
+2. Read `vault/Norman/Routines/<routine-name>.md` using obsidian-cli. Read the named routine from `vault/Norman/Routines/<routine-name>.md`
+3. If the file does not exist, tell the user clearly: "No routine found: `<routine-name>`. Check `vault/Norman/Routines/` for available routines." Do not attempt execution or write a success log when the named routine does not exist
+4. Parse only the YAML frontmatter between the opening and closing `---` delimiters to get `name`, `schedule`, `tasks`, `skills`, and `fallback_type`
+5. Execute the routine using the same execution logic as the cron path (`bin/run.sh`). Manual, HITL, and AFK paths must all work from `/norman run`:
    - **Manual tasks**: check Google Calendar for conflicts via gworkspace; create a calendar block for each; if no free slot, send an email notification
    - **HITL tasks**: load declared skills; execute automatable steps before handoff; check calendar for conflicts; create a calendar block with handoff context; send handoff email via gworkspace
    - **AFK tasks**: load declared skills from frontmatter; execute end-to-end; on failure, re-run as `fallback_type` if set, otherwise send a signal email
-5. Write execution log to `vault/Norman/Log/YYYY-MM-DD.md` (append a new section per run)
-6. Return a summary of what was executed and the outcome
+6. Write execution log to `vault/Norman/Log/YYYY-MM-DD.md` using the same log format as cron-triggered runs (append a new section per run)
+7. Return a clear summary naming the routine, tasks executed, and final outcome
 
 ---
 
