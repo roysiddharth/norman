@@ -138,12 +138,14 @@ Shared between `run` and the cron path (`bin/run.sh`).
 
 ### Task type: AFK
 
-1. Load skills declared in routine `skills` frontmatter field
-2. Execute the task end-to-end using loaded skills
-3. On failure:
-   - If `fallback_type` is set in frontmatter: re-run the task as that type
-   - Otherwise: send a signal email with failure details via gworkspace Gmail
-4. Send signal email only on failure or escalation — never on successful runs
+1. Process only tasks whose `type` is `AFK` for the AFK execution path
+2. Load skills declared in routine `skills` frontmatter field
+3. Execute the task end-to-end using loaded skills
+4. On failure:
+    - If `fallback_type` is set in frontmatter: re-run the task as that type
+    - Otherwise: send a signal email with failure details via gworkspace Gmail
+5. Send signal email only on failure or escalation — never on successful runs
+6. Append the AFK execution result to `vault/Norman/Log/YYYY-MM-DD.md` with success or failure, and any escalation
 
 ### Logging
 

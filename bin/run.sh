@@ -23,7 +23,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 ROUTINE_PATH="$ROOT_DIR/vault/Norman/Routines/$ROUTINE_NAME.md"
 
-PROMPT="Use the Norman skill. Read $ROUTINE_PATH and execute the routine named '$ROUTINE_NAME' using Norman's shared execution logic. Manual tasks must check Google Calendar and create calendar blocks. HITL tasks must execute automatable steps, create handoff calendar blocks, and send handoff emails. Write the execution log to vault/Norman/Log/YYYY-MM-DD.md and return a clear summary of the outcome."
+PROMPT="Use the Norman skill. Read $ROUTINE_PATH and execute the routine named '$ROUTINE_NAME' using Norman's shared execution logic. Manual tasks must check Google Calendar and create calendar blocks. HITL tasks must execute automatable steps, create handoff calendar blocks, and send handoff emails. AFK tasks must load declared skills, execute end-to-end, and handle fallback or signal email on failure. Write the execution log to vault/Norman/Log/YYYY-MM-DD.md and return a clear summary of the outcome."
 
 claude -p "$PROMPT"
 
