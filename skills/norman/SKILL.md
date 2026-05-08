@@ -90,11 +90,33 @@ Shared between `run` and the cron path (`bin/run.sh`).
 
 ### Routine: drain-queue
 
+Two-stage workflow: assess each pending task for ambiguity, then act.
+
+**Stage 1 — Ambiguity assessment (per task, in order):**
+
 1. Read all notes in `vault/Norman/Queue/` whose frontmatter has `status: pending`
-2. Execute each pending queue note using the existing execution path selected by its `type` field: `AFK`, `HITL`, or `Manual`
-3. After successful execution, update that queue note frontmatter to `status: done`
-4. Skip queue notes whose frontmatter status is `done` or `in_progress`
-5. Log each drained queue task to `vault/Norman/Log/YYYY-MM-DD.md` with note filename, type, description, and outcome
+2. Skip notes whose status is `done` or `in_progress`
+3. For each pending task, run structural checks first (no LLM needed):
+   - **Manual tasks**: flag as ambiguous if `due` or `duration_minutes` is missing
+   - **AFK tasks**: flag as ambiguous if `description` is fewer than 10 words or clearly underspecified (e.g., "do the thing")
+   - **HITL tasks**: flag as ambiguous if `description` is fewer than 5 words
+4. If structural checks pass, run a semantic check (LLM judgment): read the `description` and assess whether you have enough context to act on it without human input. Flag as ambiguous if the answer is no.
+
+**Stage 2 — Act on assessment:**
+
+**Ambiguous tasks:**
+1. Check Google Calendar via `norman:gworkspace` for a free 15-minute slot within the next 24 hours
+2. If a free slot exists: create a calendar brainstorm block titled "Norman: clarify — {{task_slug}}" with the ambiguity reason in the event description
+3. If no free slot: compose and send a clarification email using `vault/Norman/Templates/clarification-email.md` as the template, filling in `{{task_description}}`, `{{task_slug}}`, `{{task_filename}}`, `{{task_added_at}}`, `{{task_type}}`, `{{ambiguity_reason}}`, and `{{clarification_needed}}`
+4. Never silently skip an ambiguous task — always produce either a calendar block or an email
+5. Do not mark the queue note as `done` — leave it `pending` for the next drain cycle after clarification
+
+**Actionable tasks:**
+1. Execute using the execution path selected by the task's `type` field: `AFK`, `HITL`, or `Manual` (see task type sections below)
+2. After successful execution, update the queue note frontmatter to `status: done`
+
+**Logging (both paths):**
+After processing each task (ambiguous or executed), append to `vault/Norman/Log/YYYY-MM-DD.md` with the task filename, type, description, assessment outcome (ambiguous or actionable), and final outcome (calendar block created, email sent, or execution result).
 
 ### Task type: Manual
 
