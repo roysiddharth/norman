@@ -114,6 +114,14 @@ Format the result clearly for the Claude Code conversation:
 
 Shared between `run` and the cron path (`bin/run.sh`).
 
+### Routine: drain-queue
+
+1. Read all notes in `vault/Norman/Queue/` whose frontmatter has `status: pending`
+2. Execute each pending queue note using the existing execution path selected by its `type` field: `AFK`, `HITL`, or `Manual`
+3. After successful execution, update that queue note frontmatter to `status: done`
+4. Skip queue notes whose frontmatter status is `done` or `in_progress`
+5. Log each drained queue task to `vault/Norman/Log/YYYY-MM-DD.md` with note filename, type, description, and outcome
+
 ### Task type: Manual
 
 1. Parse task `description` and `duration_minutes` from routine note
