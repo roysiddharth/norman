@@ -59,23 +59,50 @@ Manually execute a named routine from the Obsidian vault without waiting for cro
 
 Show today's queue and recent execution log.
 
-1. Read all notes in `vault/Norman/Queue/` using obsidian-cli
-2. List pending items (status: pending) with their type and description
-3. Read `vault/Norman/Log/YYYY-MM-DD.md` for today's date
-4. Summarise completed runs: routine name, timestamp, tasks executed, outcomes
-5. Format output clearly for the Claude Code conversation:
-   ```
-   ## Norman Status — <date>
+**Step 1: List pending queue items**
 
-   ### Queue (pending)
-   - [AFK] <description>
-   - [Manual] <description>
+Invoke the `obsidian:obsidian-cli` skill. Search for notes in the Queue folder:
 
-   ### Today's Log
-   - <time> — <routine-name>: <outcome summary>
-   ```
-6. If the queue is empty, say so explicitly
-7. If no log exists for today, say so explicitly
+```bash
+obsidian search query='path:"Norman/Queue"' limit=100
+```
+
+For each result that is not `_template.md`, read the note:
+
+```bash
+obsidian read path="Norman/Queue/<filename>.md"
+```
+
+Parse frontmatter from each note. Collect only notes where `status: pending`. Extract `type` and `description` from each.
+
+**Step 2: Read today's log**
+
+Compute today's date in `YYYY-MM-DD` format. Read the log file:
+
+```bash
+obsidian read path="Norman/Log/<YYYY-MM-DD>.md"
+```
+
+If the file does not exist, note that no runs have been logged today.
+
+**Step 3: Format and output**
+
+Format the result clearly for the Claude Code conversation:
+
+```
+## Norman Status — <YYYY-MM-DD>
+
+### Queue (pending)
+- [AFK] <description>
+- [Manual] <description>
+- [HITL] <description>
+
+### Today's Log
+- <time> — <routine-name>: <outcome summary>
+```
+
+- If no pending items: output `### Queue (pending)\n_No pending tasks._`
+- If no log file for today: output `### Today's Log\n_No runs logged today._`
 
 ---
 
