@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -63,17 +64,14 @@ export function QueueSection() {
     <div className="space-y-3">
       <div className="flex gap-2">
         {(["pending", "done", "all"] as StatusFilter[]).map((f) => (
-          <button
+          <Button
             key={f}
+            size="xs"
+            variant={filter === f ? "default" : "ghost"}
             onClick={() => setFilter(f)}
-            className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
-              filter === f
-                ? "bg-primary text-primary-foreground"
-                : "bg-muted text-muted-foreground hover:bg-muted/80"
-            }`}
           >
             {f}
-          </button>
+          </Button>
         ))}
       </div>
 

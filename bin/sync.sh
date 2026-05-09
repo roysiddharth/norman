@@ -29,11 +29,15 @@ schedule_to_cron() {
     return 1
 }
 
-extract_schedule() {
-    local file="$1"
-    awk '/^---/{if(++n==2)exit} n==1 && /^schedule:/' "$file" \
-        | sed 's/^schedule:[[:space:]]*//' \
+extract_field() {
+    local file="$1" field="$2"
+    awk '/^---/{if(++n==2)exit} n==1 && /^'"$field"':/' "$file" \
+        | sed "s/^$field:[[:space:]]*//" \
         | tr -d '"'
+}
+
+extract_schedule() {
+    extract_field "$1" "schedule"
 }
 
 generate_entries() {
@@ -44,6 +48,10 @@ generate_entries() {
         local name
         name="$(basename "$routine_file" .md)"
         [[ "$name" == "_template" ]] && continue
+
+        local enabled
+        enabled="$(extract_field "$routine_file" "enabled")"
+        [[ "$enabled" == "false" ]] && continue
 
         local schedule
         schedule="$(extract_schedule "$routine_file")"
