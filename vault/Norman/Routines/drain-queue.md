@@ -1,6 +1,6 @@
 ---
 name: drain-queue
-enabled: false
+enabled: true
 schedule: "every 15 minutes"
 tasks:
   - description: "Drain all pending Norman queue notes"

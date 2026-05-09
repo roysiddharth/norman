@@ -1,6 +1,6 @@
 {
   "name": "norman",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Personal AI executive assistant — runs routines from your Obsidian vault, manages your calendar, and drains your task queue.",
   "author": {
     "name": "Siddharth Roy",
