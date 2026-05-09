@@ -49,8 +49,16 @@ PROMPT="${SKILL_BLOCK}You are executing the Norman routine '${ROUTINE_NAME}'. He
 ${ROUTINE_CONTENT}
 ---ROUTINE END---
 
-Execute the routine named '${ROUTINE_NAME}' using Norman's shared execution logic. Manual tasks must check Google Calendar and create calendar blocks. HITL tasks must execute automatable steps, create handoff calendar blocks, and send handoff emails. AFK tasks must load declared skills, execute end-to-end, and handle fallback or signal email on failure. Write the execution log to vault/Norman/Log/YYYY-MM-DD.md and return a clear summary of the outcome."
+Execute the routine named '${ROUTINE_NAME}' using Norman's shared execution logic. Manual tasks must check Google Calendar and create calendar blocks. HITL tasks must execute automatable steps, create handoff calendar blocks, and send handoff emails. AFK tasks must load declared skills, execute end-to-end, and handle fallback or signal email on failure. Return a clear summary of the outcome."
 
-claude --dangerously-skip-permissions -p "$PROMPT"
+# Export routine name so the Stop hook can identify this run
+export NORMAN_ROUTINE="$ROUTINE_NAME"
+
+# Capture stdout to a temp file for the Stop hook; also display it
+export NORMAN_OUTPUT
+NORMAN_OUTPUT="$(mktemp /tmp/norman_XXXXXX)"
+trap 'rm -f "$NORMAN_OUTPUT"' EXIT
+
+claude --dangerously-skip-permissions -p "$PROMPT" | tee "$NORMAN_OUTPUT"
 
 echo "Norman run.sh: triggered routine '$ROUTINE_NAME'."
