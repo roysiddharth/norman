@@ -2,6 +2,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { QueueSection } from "@/components/queue-section";
+import { RoutinesSection } from "@/components/routines-section";
 
 export default function Home() {
   return (
@@ -28,7 +29,7 @@ export default function Home() {
             <CardTitle>Routines</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-muted-foreground text-sm">Loading…</p>
+            <RoutinesSection />
           </CardContent>
         </Card>
 
